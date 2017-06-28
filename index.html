@@ -1,27 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
+    <link rel="stylesheet" href="style-sheet.css">
+    <title>Twittler</title>
   </head>
   <body>
-    <script>
+    <div class="topBar" > 
+      <h1> Twittler </h1>
+    </div>
+    <div class="stream">
+      <script>
 
-      $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
+        $(document).ready(function(){
+          var $stream = $('.stream');
+          //$body.html('');
+          var index = streams.home.length - 1;
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
-          index -= 1;
-        }
+          while(index >= 0){
+            var tweet = streams.home[index];
+            var $tweet = $('<div class=' +tweet.user+ '></div>');
+            var content = '@' + tweet.user + ': ' + tweet.message + '<br> Posted: ' + tweet.created_at.toString().substr(4,24);
+            $tweet.html(content);
+            $tweet.appendTo($stream);
+            index -= 1;          
+          }
+          //sets starting and stopping points for 'newTweets'
+          var readyIndex = streams.home.length-1;
+          var startIndex = readyIndex+1;
+          //pulls new tweets from data generator
+          function newTweets() {
+            
+            var endIndex = streams.home.length;
+            for(var i = startIndex ; i < endIndex ; i++) {
+              var tweet = streams.home[i];
+              // maintains consistency with on click function below
+              var toggled = $('.' +tweet.user).attr('style');
+              if (toggled) {
+                var $tweet = $('<div class=' +tweet.user+ ' style="'+ toggled + '"></div>');
+              } else {
+                var $tweet = $('<div class=' +tweet.user+ '></div>');
+              }
+              var content = '<span> @' + tweet.user + '</span>: ' + tweet.message + '<br> Posted: ' + tweet.created_at.toString().substr(4,24);
+              $tweet.html(content);
+              $tweet.appendTo($stream);
+            }
+            startIndex = endIndex;
+            setTimeout(newTweets,5000);
+          };
+          setTimeout(newTweets,3000);
+          // on click hides tweets from other users
+          $('.stream').on('click','div', function() {
+            var user = 'div:not(.' + $(this).attr('class') + ')';
+              $('.stream >' + user).slideToggle()
+          })
+        });
 
-      });
+          // some notes on project requirements :
+          // 1)show the user new tweets somehow.(you can show them automativally as they're created, or create a button that displays new tweets)
 
-    </script>
+          // display the timestaps of when the tweets were created, and should not just be hard coded(optional show when created in 'human friendly' i.e. 10 minutes ago,  will require an additional library to complete)
+
+          // design interface so that you want to look at and use the product you're making. 
+            // no native CSS elements present,  will have to style it up a bit! 
+
+          // allow the user to click on a username to see that users timeline.
+            // altertweet text so that the tweet.user prints to the dom as a hyperlink
+              // set an on('click') to a filter that only shows that users tweets
+            //ad a 'follow' buttom to the end(?) that adds the tweet.user to the stream.user.home
+
+          //optional allow the user to tweet! 
+            //text box with submit button
+              // submit on('click') to add users tweet to the streams.home array. 
+
+
+          //data_generator.js:
+          //creats two global variables:
+          //users: is an array of strings -- all the usernames that you are following
+
+          // streams: 
+          //an object with two properties, 
+            // users
+            //an object with properties for each user. streams.users.shawndreost has all of shawndreost's tweets
+            // home
+            // an array of all tweets from all the users you are following. 
+
+      </script>
+    </div>
   </body>
 </html>
